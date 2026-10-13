@@ -51,7 +51,7 @@ The order answers:
 
 ## 3. Minimal complete example
 
-``text
+```text
 @delivery
 
 D: delivery → requested paid assigned tracked delivered settled
@@ -102,13 +102,13 @@ X:
   ¬ settle(code ≠ valid)
   ¬ settle(location ≠ dropoff)
   ¬ select(courier ∉ available)
-``
+```
 
 ## 4. Lexical model
 
 The language contains declarations, identifiers, operators, grouping, qualifiers, and annotations.
 
-``text
+```text
 D:       declaration
 delivery identifier
 →        operator
@@ -116,7 +116,7 @@ pickup + dropoff   composition
 select(min distance) parameterized semantic operation
 customer { ... }   capability set
 @delivery          annotation
-``
+```
 
 Whitespace is insignificant except for token separation. Identifiers are case-sensitive. Reserved words and canonical aliases are defined in RESERVED-WORDS.md.
 
@@ -163,7 +163,7 @@ Runtime conformance evaluates observed evidence against the declared trajectory.
 
 The validator must be able to answer:
 
-``text
+```text
 who acted?
 what happened?
 in which state?
@@ -171,13 +171,13 @@ through which skill?
 with which evidence?
 under which constraints?
 what state followed?
-``
+```
 
 The trajectory is the semantic history. Logs are only one possible physical source of evidence.
 
 ## 8. Canonical pipeline
 
-``text
+```text
 source
 → parse
 → AST
@@ -189,7 +189,7 @@ source
 → observe
 → compare
 → conformance
-``
+```
 
 The parser must not execute business behavior.
 
