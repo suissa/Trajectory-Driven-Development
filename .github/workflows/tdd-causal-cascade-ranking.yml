@@ -1,0 +1,29 @@
+name: T-DD Causal Cascade Ranking
+
+on:
+  pull_request:
+    paths:
+      - 'docs/DSL/causal-cascade-ranking.*'
+      - 'docs/DSL/causal_cascade_ranking.py'
+      - 'docs/DSL/test_causal_cascade_ranking.py'
+      - 'docs/DSL/trajectory-causal-paths.mjs'
+      - 'docs/DSL/trajectory_causal_paths.py'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/DSL/causal-cascade-ranking.*'
+      - 'docs/DSL/causal_cascade_ranking.py'
+      - 'docs/DSL/test_causal_cascade_ranking.py'
+      - 'docs/DSL/trajectory-causal-paths.mjs'
+      - 'docs/DSL/trajectory_causal_paths.py'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test docs/DSL/causal-cascade-ranking.test.mjs
+      - run: python -m unittest docs/DSL/test_causal_cascade_ranking.py
