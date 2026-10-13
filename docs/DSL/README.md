@@ -108,14 +108,14 @@ X:
 
 The language contains declarations, identifiers, operators, grouping, qualifiers, and annotations.
 
-|D:  |     declaration|
-----------------------
-| delivery | identifier|
-| →        | operator| 
-| pickup + dropoff   | composition| 
-| select(min distance) | parameterized semantic operation| 
-| customer { ... }   | capability set| 
-| @delivery          | annotation| 
+| D: | declaration |
+| --- | --- |
+| delivery | identifier |
+| $\rightarrow$ | operator |
+| pickup + dropoff | composition |
+| select(min distance) | parameterized semantic operation |
+| customer { ... } | capability set |
+| @delivery | annotation |
 
 Whitespace is insignificant except for token separation. Identifiers are case-sensitive. Reserved words and canonical aliases are defined in RESERVED-WORDS.md.
 
