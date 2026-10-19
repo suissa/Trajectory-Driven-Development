@@ -86,7 +86,7 @@ pub const Artifact = struct {
     first_divergence: ?Divergence,
 };
 
-pub fn runBuyProduct(allocator: std.mem.Allocator, mode: StockMode) !Artifact {
+pub fn runBuyProduct(mode: StockMode) Artifact {
     const intent = Intent{};
     const customer = Customer{ .id = intent.customer_id, .active = true };
     const product = Product{ .id = intent.product_id, .unit_price_cents = intent.unit_price_cents };
@@ -131,8 +131,8 @@ pub fn runBuyProduct(allocator: std.mem.Allocator, mode: StockMode) !Artifact {
         .sequence = 3,
         .entity = "Stock",
         .invariant = "stock_after == stock_before - sold_quantity",
-        .expected = try std.fmt.allocPrint(allocator, "{d}", .{stock.expected_after}),
-        .observed = try std.fmt.allocPrint(allocator, "{d}", .{stock.observed_after}),
+        .expected = "8",
+        .observed = "9",
         .diagnostic = "Sale and financial record exist, but inventory deduction is short by one unit.",
     } else null;
 
@@ -169,8 +169,8 @@ pub fn runBuyProduct(allocator: std.mem.Allocator, mode: StockMode) !Artifact {
             .entity = "Stock",
             .action = "deduct_inventory",
             .status = if (stock_diverged) "diverged" else "passed",
-            .expected = try std.fmt.allocPrint(allocator, "stock_after == {d}", .{stock.expected_after}),
-            .observed = try std.fmt.allocPrint(allocator, "stock_after == {d}", .{stock.observed_after}),
+            .expected = "stock_after == 8",
+            .observed = if (stock_diverged) "stock_after == 9" else "stock_after == 8",
             .causal_parent = 2,
         },
         .{
@@ -191,8 +191,8 @@ pub fn runBuyProduct(allocator: std.mem.Allocator, mode: StockMode) !Artifact {
         .{
             .entity = "Stock",
             .id = stock.product_id,
-            .state_before = try std.fmt.allocPrint(allocator, "quantity={d}", .{stock.before}),
-            .state_after = try std.fmt.allocPrint(allocator, "quantity={d}", .{stock.observed_after}),
+            .state_before = "quantity=10",
+            .state_after = if (stock_diverged) "quantity=9" else "quantity=8",
         },
         .{ .entity = "Delivery", .id = delivery.id, .state_before = "not_created", .state_after = if (delivery.created) "created" else "not_created" },
     };
@@ -211,7 +211,7 @@ pub fn serializeArtifact(allocator: std.mem.Allocator, artifact: Artifact) ![]u8
 }
 
 test "buy-product traverses Customer -> Sales -> Financial -> Stock -> Delivery" {
-    const artifact = try runBuyProduct(std.testing.allocator, .correct);
+    const artifact = runBuyProduct(.correct);
     try std.testing.expectEqualStrings("passed", artifact.status);
     try std.testing.expect(artifact.first_divergence == null);
     try std.testing.expectEqualStrings("Customer", artifact.steps[0].entity);
@@ -224,7 +224,7 @@ test "buy-product traverses Customer -> Sales -> Financial -> Stock -> Delivery"
 
 test "stock divergence preserves full trajectory and pinpoints first divergence" {
     const allocator = std.testing.allocator;
-    const artifact = try runBuyProduct(allocator, .diverge);
+    const artifact = runBuyProduct(.diverge);
     try std.testing.expectEqualStrings("diverged", artifact.status);
     try std.testing.expect(artifact.first_divergence != null);
     const divergence = artifact.first_divergence.?;
