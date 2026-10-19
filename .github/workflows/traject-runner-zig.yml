@@ -1,0 +1,40 @@
+name: Traject Runner Zig 0.16
+
+on:
+  push:
+    branches: [main, "feat/traject-runner-zig-016"]
+    paths:
+      - "zig/**"
+      - ".github/workflows/traject-runner-zig.yml"
+  pull_request:
+    paths:
+      - "zig/**"
+      - ".github/workflows/traject-runner-zig.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  traject-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Zig 0.16.0
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+      - name: Run Traject tests
+        run: zig test zig/traject_runner.zig
+      - name: Generate diagnostic trajectory artifact
+        run: |
+          mkdir -p artifacts
+          zig run zig/main.zig 2> artifacts/trajectory.json
+          node -e 'const fs=require("node:fs"); const a=JSON.parse(fs.readFileSync("artifacts/trajectory.json","utf8")); if(a.schema_version!==1 || a.status!=="diverged" || a.first_divergence?.entity!=="Stock" || a.first_divergence?.expected!=="8" || a.first_divergence?.observed!=="9" || a.steps.length!==5 || a.steps[4].entity!=="Delivery") process.exit(1); console.log("Validated trajectory artifact: Stock divergence at step 3; all 5 stages captured.")'
+      - name: Upload Trajectory Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: traject-buy-product-stock-divergence
+          path: artifacts/trajectory.json
+          if-no-files-found: error
+          retention-days: 30
