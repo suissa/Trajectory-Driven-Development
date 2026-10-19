@@ -3,7 +3,7 @@ const traject = @import("traject_runner.zig");
 
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
-    const artifact = try traject.runBuyProduct(allocator, .diverge);
+    const artifact = traject.runBuyProduct(.diverge);
     const json = try traject.serializeArtifact(allocator, artifact);
     defer allocator.free(json);
 
